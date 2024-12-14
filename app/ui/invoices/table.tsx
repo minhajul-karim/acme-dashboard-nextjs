@@ -30,7 +30,6 @@ export default async function InvoicesTable({
         <div className="rounded-lg bg-gray-50 p-2 md:pt-0">
           <div className="md:hidden">
             {invoices?.map((invoice: Invoice) => {
-              console.log(invoice)
               return (
               <div
                 key={invoice.id}
