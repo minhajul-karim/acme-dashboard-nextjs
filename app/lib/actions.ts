@@ -4,6 +4,15 @@ import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+export type State = {
+  errors?: {
+    customerId?: string[];
+    amount?: string[];
+    status?: string[];
+  };
+  message?: string | null;
+};
+
 const connectionPool = require("../../db");
 
 const FormSchema = z.object({
@@ -20,13 +29,13 @@ const FormSchema = z.object({
 
 const CreateInvoice = FormSchema.omit({ id: true, date: true });
 
-export async function createInvoice(formData: FormData) {
+export async function createInvoice(prevState: State, formData: FormData) {
   const rawFormData = {
     customerId: formData.get("customerId"),
     amount: formData.get("amount"),
     status: formData.get("status"),
   };
-  
+
   const validatedFields = CreateInvoice.safeParse(rawFormData);
   if (!validatedFields.success) {
     return {
