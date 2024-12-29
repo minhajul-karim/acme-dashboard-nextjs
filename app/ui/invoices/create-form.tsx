@@ -19,7 +19,7 @@ export default function Form({ customers }: { customers: CustomerField[] }) {
   const [state, formAction] = useActionState(createInvoice, initialState);
   const formErrorExists = state.errors && Object.keys(state.errors).length > 0; 
 
-  let formErrorMessage = formErrorExists && (
+  const formErrorMessage = formErrorExists && (
     <div id="customer-id-error" aria-live="polite" aria-atomic="true">
       <p className="mt-2 text-sm text-red-500">
         {state.message}

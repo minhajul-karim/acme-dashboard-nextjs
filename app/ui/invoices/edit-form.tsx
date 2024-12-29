@@ -29,14 +29,13 @@ export default function EditInvoiceForm({
   const [state, formAction] = useActionState(handleSubmit, initialState);
   const formErrorExists = state.errors && Object.keys(state.errors).length > 0; 
 
-  let formErrorMessage = formErrorExists && (
+  const formErrorMessage = formErrorExists && (
     <div id="customer-id-error" aria-live="polite" aria-atomic="true">
       <p className="mt-2 text-sm text-red-500">
         {state.message}
       </p>
     </div>
   );
-  console.log("STATE", state)
 
   return (
     <form action={formAction}>
@@ -79,7 +78,7 @@ export default function EditInvoiceForm({
                 name="amount"
                 type="number"
                 step="0.01"
-                defaultValue={invoice.amount}
+                defaultValue={formErrorExists ? "" : invoice.amount}
                 placeholder="Enter USD amount"
                 className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
               />
