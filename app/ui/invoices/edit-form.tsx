@@ -11,6 +11,7 @@ import {
 import Link from 'next/link';
 import { Button } from '@/app/ui/button';
 import { updateInvoice, State } from '@/app/lib/actions';
+import ErrorMessage from './error-message';
 
 export default function EditInvoiceForm({
   invoice,
@@ -26,6 +27,16 @@ export default function EditInvoiceForm({
   }
   
   const [state, formAction] = useActionState(handleSubmit, initialState);
+  const formErrorExists = state.errors && Object.keys(state.errors).length > 0; 
+
+  let formErrorMessage = formErrorExists && (
+    <div id="customer-id-error" aria-live="polite" aria-atomic="true">
+      <p className="mt-2 text-sm text-red-500">
+        {state.message}
+      </p>
+    </div>
+  );
+  console.log("STATE", state)
 
   return (
     <form action={formAction}>
@@ -53,6 +64,7 @@ export default function EditInvoiceForm({
             </select>
             <UserCircleIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500" />
           </div>
+          <ErrorMessage errors={state.errors?.customerId} />
         </div>
 
         {/* Invoice Amount */}
@@ -74,6 +86,7 @@ export default function EditInvoiceForm({
               <CurrencyDollarIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
             </div>
           </div>
+          <ErrorMessage errors={state.errors?.amount} />
         </div>
 
         {/* Invoice Status */}
@@ -117,7 +130,9 @@ export default function EditInvoiceForm({
               </div>
             </div>
           </div>
+          <ErrorMessage errors={state.errors?.status} />
         </fieldset>
+        {formErrorMessage}
       </div>
       <div className="mt-6 flex justify-end gap-4">
         <Link
