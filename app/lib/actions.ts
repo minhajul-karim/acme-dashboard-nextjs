@@ -62,13 +62,21 @@ export async function createInvoice(prevState: State, formData: FormData) {
   redirect("/dashboard/invoices");
 }
 
-export async function updateInvoice(invoiceId: string, formData: FormData) {
+export async function updateInvoice(prevState: State, formData: FormData, invoiceId: string) {
   const rawFormData = {
     customerId: formData.get("customerId"),
     amount: formData.get("amount"),
     status: formData.get("status"),
   };
-  const { customerId, amount, status } = CreateInvoice.parse(rawFormData);
+
+  const validatedFields = CreateInvoice.safeParse(rawFormData);
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: "Missing fields. Failed to update invoice"
+    }
+  }
+  const { customerId, amount, status } = validatedFields.data;
   const amountInCents = amount * 100;
 
   try {
