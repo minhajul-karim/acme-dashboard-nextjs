@@ -8,7 +8,7 @@ export default function SideNav() {
 
   const handleFormAction = async () => {
     "use server";
-    await signOut();
+    await signOut({ redirectTo: "/login" });
   }
 
   return (
