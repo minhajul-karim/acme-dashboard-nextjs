@@ -3,11 +3,16 @@ import LatestInvoices from "@/app/ui/dashboard/latest-invoices";
 import CardWrapper from "@/app/ui/dashboard/cards";
 import { montserrat } from "@/app/ui/fonts";
 import { Suspense } from "react";
+import { Metadata } from "next";
 import {
   RevenueChartSkeleton,
   LatestInvoicesSkeleton,
   CardsSkeleton,
 } from "@/app/ui/skeletons";
+
+export const metadata: Metadata = {
+  title: "Dashboard | Acme"
+}
 
 export default async function Page() {
   return (
