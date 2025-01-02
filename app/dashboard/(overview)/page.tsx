@@ -11,7 +11,7 @@ import {
 } from "@/app/ui/skeletons";
 
 export const metadata: Metadata = {
-  title: "Dashboard | Acme"
+  title: "Dashboard"
 }
 
 export default async function Page() {

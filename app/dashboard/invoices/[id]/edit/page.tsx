@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: "Edit Invoices | Acme Dashboard"
+  title: "Edit Invoices"
 }
 
 export default async function UpdateInvoiceForm(props: {

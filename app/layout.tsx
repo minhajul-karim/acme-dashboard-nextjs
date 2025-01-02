@@ -3,7 +3,10 @@ import { montserrat } from "@/app/ui/fonts";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Acme dashboard",
+  title: {
+    template: "%s | Acme dashboard",
+    default: "Acme dashboard"
+  },
   description: "The extended version of the Next.js Course Dashboard, built with App Router.",
   metadataBase: new URL("https://acme-dashboard-nextjs-chi.vercel.app")
 }

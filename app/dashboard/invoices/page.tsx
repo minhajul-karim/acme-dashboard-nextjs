@@ -9,7 +9,7 @@ import { Suspense } from "react";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Invoices | Acme Dashboard"
+  title: "Invoices"
 }
 
 export default async function Page(props: {
