@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState } from 'react';
+import { FormEvent, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { montserrat } from '@/app/ui/fonts';
 import {
   AtSymbolIcon,
@@ -11,10 +12,22 @@ import { Button } from './button';
 import { authenticate } from '../lib/actions';
 
 export default function LoginForm() {
-  const [errorMessage, formAction, isPending] = useActionState(authenticate, undefined);
+  const [errorMessage, setErrorMessage] = useState("");
+  const router = useRouter();
+
+  const handleFormSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const response = await authenticate(formData);
+    if (response.error) {
+      setErrorMessage(response.message);
+    } else {
+      router.push("/dashboard");
+    }
+  }
 
   return (
-    <form action={formAction} className="space-y-3">
+    <form className="space-y-3" onSubmit={handleFormSubmit}>
       <div className="flex-1 rounded-lg bg-gray-50 px-6 pb-4 pt-8">
         <h1 className={`${montserrat.className} mb-3 text-2xl`}>
           Please log in to continue.
@@ -60,7 +73,7 @@ export default function LoginForm() {
             </div>
           </div>
         </div>
-        <Button className="mt-4 w-full" aria-disabled={isPending}>
+        <Button className="mt-4 w-full" aria-disabled={false}>
           Log in <ArrowRightIcon className="ml-auto h-5 w-5 text-gray-50" />
         </Button>
         <div className="flex h-8 items-end space-x-1">
