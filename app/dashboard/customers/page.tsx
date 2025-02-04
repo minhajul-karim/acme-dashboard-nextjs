@@ -1,12 +1,14 @@
-import React from "react";
+import React, { Suspense } from "react";
 import Search from "@/app/ui/search";
 import { Metadata } from "next";
 import { montserrat } from "@/app/ui/fonts";
 import { CreateCustomer } from "@/app/ui/invoices/buttons";
+import CustomersTable from "@/app/ui/customers/table";
+import { CustomersTableSkeleton } from "@/app/ui/skeletons";
 
 export const metadata: Metadata = {
-  title: "Customers"
-}
+  title: "Customers",
+};
 
 export default function Customers() {
   return (
@@ -16,6 +18,9 @@ export default function Customers() {
         <Search placeholder="Search customers..." />
         <CreateCustomer />
       </div>
+      <Suspense fallback={<CustomersTableSkeleton />}>
+        <CustomersTable />
+      </Suspense>
     </div>
   );
 }
