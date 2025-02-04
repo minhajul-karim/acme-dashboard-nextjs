@@ -10,7 +10,16 @@ export const metadata: Metadata = {
   title: "Customers",
 };
 
-export default function Customers() {
+export default async function Customers(props: {
+  searchParams: Promise<{
+    query?: string;
+    page?: string;
+  }>;
+}) {
+  const searchParams = await props.searchParams;
+  const query = searchParams?.query || "";
+  const currentPage = Number(searchParams?.page) || 1;
+
   return (
     <div>
       <h1 className={`${montserrat.className} text-2xl`}>Customers</h1>
@@ -19,7 +28,7 @@ export default function Customers() {
         <CreateCustomer />
       </div>
       <Suspense fallback={<CustomersTableSkeleton />}>
-        <CustomersTable />
+        <CustomersTable query={query} currentPage={currentPage} />
       </Suspense>
     </div>
   );

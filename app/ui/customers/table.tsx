@@ -1,13 +1,17 @@
 import Image from 'next/image';
-import { lusitana } from '@/app/ui/fonts';
-import Search from '@/app/ui/search';
 import {
   FormattedCustomersTable,
 } from '@/app/lib/definitions';
 import { fetchFilteredCustomers } from '@/app/lib/data';
 
-export default async function CustomersTable() {
-  const customers: FormattedCustomersTable[] = await fetchFilteredCustomers('');
+export default async function CustomersTable({
+  query,
+  currentPage,
+}: {
+  query: string;
+  currentPage: number;
+}) {
+  const customers: FormattedCustomersTable[] = await fetchFilteredCustomers(query, currentPage);
 
   return (
     <div className="w-full">
