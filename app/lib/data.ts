@@ -166,7 +166,8 @@ export async function fetchCustomers() {
     const data = await connectionPool.query(`
       SELECT
         id,
-        name
+        name,
+        image_url
       FROM customers
       ORDER BY name ASC
     `);
