@@ -1,15 +1,43 @@
 "use client";
 
-import { useState } from "react";
+import { useState, FormEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "../button";
+import { createCustomer, CreateCustomerState } from "@/app/lib/actions";
+import ErrorMessage from "../invoices/error-message";
 
 export default function Form({ avatars }: { avatars: string[] }) {
+  const initialState: CreateCustomerState = { message: null, fieldErrors: {} };
   const [avatar, setAvatar] = useState("");
+  const [errors, setErrors] = useState(initialState);
+
+  const formErrorExists = Object.keys(errors?.fieldErrors ?? {}).length > 0;
+  const formErrorMessageUI = formErrorExists && (
+    <div id="customer-id-error" aria-live="polite" aria-atomic="true">
+      <p className="mt-2 text-sm text-red-500">{errors.message}</p>
+    </div>
+  );
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const data = await createCustomer(formData);
+    const newErrors = { ...errors };
+
+    if (data?.message) {
+      newErrors.message = data.message;
+    }
+
+    if (data?.fieldErrors) {
+      newErrors.fieldErrors = data.fieldErrors;
+    }
+
+    setErrors(newErrors);
+  };
 
   return (
-    <form>
+    <form onSubmit={handleSubmit}>
       {/* Customer name */}
       <div className="mb-4">
         <label
@@ -19,6 +47,7 @@ export default function Form({ avatars }: { avatars: string[] }) {
           Customer Name
         </label>
         <input
+          required
           type="text"
           id="customerName"
           name="customerName"
@@ -26,6 +55,7 @@ export default function Form({ avatars }: { avatars: string[] }) {
           aria-describedby="customer-name-error"
           className="peer block w-full rounded-md border border-gray-200 py-2 text-sm outline-2 placeholder:text-gray-500"
         />
+        <ErrorMessage errors={errors.fieldErrors?.customerName} />
       </div>
       {/* Customer email */}
       <div className="mb-4">
@@ -36,13 +66,15 @@ export default function Form({ avatars }: { avatars: string[] }) {
           Customer Email
         </label>
         <input
-          type="email"
+          required
+          type="text"
           id="customerEmail"
-          name="customerName"
+          name="customerEmail"
           placeholder="Enter customer email"
           aria-describedby="customer-email-error"
           className="peer block w-full rounded-md border border-gray-200 py-2 text-sm outline-2 placeholder:text-gray-500"
         />
+        <ErrorMessage errors={errors.fieldErrors?.customerEmail} />
       </div>
       {/* Customer avatar */}
       <div className="mb-4">
@@ -51,12 +83,13 @@ export default function Form({ avatars }: { avatars: string[] }) {
         </label>
         <div className="flex justify-start items-center gap-4">
           <select
+            required
             id="avatar"
             name="avatar"
             value={avatar}
             aria-describedby="customer-avatar-error"
             onChange={(e) => setAvatar(e.target.value)}
-            className="rounded-md border border-gray-200 py-2 text-sm outline-2 text-gray-500"
+            className="rounded-md border border-gray-200 py-2 text-sm outline-2"
           >
             <option value="" disabled>
               Select an avatar
@@ -77,7 +110,9 @@ export default function Form({ avatars }: { avatars: string[] }) {
             />
           )}
         </div>
+        <ErrorMessage errors={errors.fieldErrors?.avatar} />
       </div>
+      {formErrorMessageUI}
       {/* Submission */}
       <div className="mt-6 flex justify-end gap-4">
         <Link

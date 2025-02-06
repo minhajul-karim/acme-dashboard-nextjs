@@ -15,6 +15,35 @@ export type State = {
   message?: string | null;
 };
 
+export type CreateCustomerState = {
+  fieldErrors?: {
+    customerName?: string[];
+    customerEmail?: string[];
+    avatar?: string[];
+  };
+  message?: string | null;
+};
+
+// export type CreateCustomerState = {
+//   inputs?: {
+//     customerName: FormDataEntryValue | null;
+//     customerEmail: FormDataEntryValue | null;
+//     avatar: FormDataEntryValue | null;
+//   };
+//   errors?: {
+//     customerName?: string[];
+//     customerEmail?: string[];
+//     avatar?: string[];
+//   };
+//   message?: string | null;
+// };
+
+interface RawCreateCustomerFormData {
+  customerName: FormDataEntryValue | null;
+  customerEmail: FormDataEntryValue | null;
+  avatar: FormDataEntryValue | null;
+}
+
 const connectionPool = require("../../db");
 
 const FormSchema = z.object({
@@ -29,6 +58,15 @@ const FormSchema = z.object({
     invalid_type_error: "Please select an invoice status.",
   }),
   date: z.string(),
+});
+
+const CustomerSchema = z.object({
+  customerName: z.string().min(1, { message: "Please enter a customer name" }),
+  customerEmail: z.string().email({ message: "Please enter a valid email" }),
+  avatar: z.string({
+    required_error: "Please select an avatar",
+    invalid_type_error: "Please select an avatar",
+  }),
 });
 
 const CreateInvoice = FormSchema.omit({ id: true, date: true });
@@ -135,5 +173,20 @@ export async function authenticate(formData: FormData) {
       }
     }
     throw error;
+  }
+}
+
+export async function createCustomer(formData: FormData) {
+  const rawFormData: RawCreateCustomerFormData = {
+    customerName: formData.get("customerName"),
+    customerEmail: formData.get("customerEmail"),
+    avatar: formData.get("avatar"),
+  };
+  const validatedFields = CustomerSchema.safeParse(rawFormData);
+  if (!validatedFields.success) {
+    return {
+      fieldErrors: validatedFields.error.flatten().fieldErrors,
+      message: "There are errors in the form. Failed to create customer",
+    };
   }
 }
