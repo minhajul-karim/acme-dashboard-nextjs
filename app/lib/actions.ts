@@ -24,20 +24,6 @@ export type CreateCustomerState = {
   message?: string | null;
 };
 
-// export type CreateCustomerState = {
-//   inputs?: {
-//     customerName: FormDataEntryValue | null;
-//     customerEmail: FormDataEntryValue | null;
-//     avatar: FormDataEntryValue | null;
-//   };
-//   errors?: {
-//     customerName?: string[];
-//     customerEmail?: string[];
-//     avatar?: string[];
-//   };
-//   message?: string | null;
-// };
-
 interface RawCreateCustomerFormData {
   customerName: FormDataEntryValue | null;
   customerEmail: FormDataEntryValue | null;
@@ -189,4 +175,18 @@ export async function createCustomer(formData: FormData) {
       message: "There are errors in the form. Failed to create customer",
     };
   }
+
+  const { customerName, customerEmail, avatar } = validatedFields.data;
+  try {
+    await connectionPool.query(`
+      INSERT INTO customers (name, email, image_url)
+      VALUES ('${customerName}', '${customerEmail}', '${avatar}')
+    `);
+    revalidatePath("/dashboard/customers");
+  } catch (error) {
+    console.error(error);
+    return { message: "Database Error: Failed to create customer" };
+  }
+
+  redirect("/dashboard/customers");
 }
