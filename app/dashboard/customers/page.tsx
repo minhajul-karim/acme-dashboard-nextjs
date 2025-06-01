@@ -21,7 +21,8 @@ export default async function Customers(props: {
   const searchParams = await props.searchParams;
   const query = searchParams?.query || "";
   const currentPage = Number(searchParams?.page) || 1;
-  const totalPages = await fetchCustomersPages(query);
+  const totalPagesResult = await fetchCustomersPages(query);
+  const totalPages = typeof totalPagesResult === "number" ? totalPagesResult : 0;
 
   return (
     <div>
