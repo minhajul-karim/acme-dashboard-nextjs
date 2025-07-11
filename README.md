@@ -15,13 +15,13 @@ pnpm install   # or npm install
 ### **3. Set Up Environment Variables**
 Create a `.env` file in the root directory and add the following:
 ```env
-POSTGRES_URL="postgres://user:password@host:port/database"
-POSTGRES_URL_NON_POOLING="postgres://user:password@host:port/database"
+POSTGRES_URL="postgres://user:***@host:port/database"
+POSTGRES_URL_NON_POOLING="postgres://user:***@host:port/database"
 POSTGRES_USER="user"
 POSTGRES_HOST="host"
-POSTGRES_PASSWORD="password"
+POSTGRES_PASSWORD="***"
 POSTGRES_DATABASE="database"
-AUTH_SECRET="your_auth_secret"
+AUTH_SECRET="***"
 ```
 
 ### **4. Start the Development Server**

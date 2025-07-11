@@ -1,11 +1,14 @@
 const connectionPool = require("../../db");
-import {
-  CustomersTableType,
-  InvoicesTable,
-} from './definitions';
-import { formatCurrency } from './utils';
+import {CustomersTableType, InvoicesTable,} from './definitions';
+import {formatCurrency} from './utils';
+
+const isBuildRunning = process.env.SKIP_DB_VALIDATION === "true";
 
 export async function fetchRevenue() {
+  if (isBuildRunning) {
+    return [];
+  }
+
   try {
     // Artificially delay a response for demo purposes.
     // Don't do this in production :)
@@ -25,6 +28,10 @@ export async function fetchRevenue() {
 }
 
 export async function fetchLatestInvoices() {
+  if (isBuildRunning) {
+    return [];
+  }
+
   try {
     const data = await connectionPool.query(`
       SELECT invoices.amount, customers.name, customers.image_url, customers.email, invoices.id
@@ -33,11 +40,10 @@ export async function fetchLatestInvoices() {
       ORDER BY invoices.date DESC
       LIMIT 5`);
 
-    const latestInvoices = data.rows.map((invoice: InvoicesTable) => ({
+    return data.rows.map((invoice: InvoicesTable) => ({
       ...invoice,
       amount: formatCurrency(invoice.amount),
     }));
-    return latestInvoices;
   } catch (error) {
     console.error('Database Error:', error);
     throw new Error('Failed to fetch the latest invoices.');
@@ -45,6 +51,15 @@ export async function fetchLatestInvoices() {
 }
 
 export async function fetchCardData() {
+  if (isBuildRunning) {
+    return {
+      numberOfCustomers: 0,
+      numberOfInvoices: 0,
+      totalPaidInvoices: 0,
+      totalPendingInvoices: 0,
+    };
+  }
+
   try {
     // You can probably combine these into a single SQL query
     // However, we are intentionally splitting them to demonstrate
@@ -84,6 +99,9 @@ export async function fetchFilteredInvoices(
   query: string,
   currentPage: number,
 ) {
+  if (isBuildRunning) {
+    return [];
+  }
   const offset = (currentPage - 1) * ITEMS_PER_PAGE;
 
   try {
@@ -116,6 +134,10 @@ export async function fetchFilteredInvoices(
 }
 
 export async function fetchInvoicesPages(query: string) {
+  if (isBuildRunning) {
+    return 0;
+  }
+
   try {
     const count = await connectionPool.query(`SELECT COUNT(*)
     FROM invoices
@@ -128,8 +150,7 @@ export async function fetchInvoicesPages(query: string) {
       invoices.status ILIKE '${`%${query}%`}'
   `);
 
-    const totalPages = Math.ceil(Number(count.rows[0].count) / ITEMS_PER_PAGE);
-    return totalPages;
+    return Math.ceil(Number(count.rows[0].count) / ITEMS_PER_PAGE);
   } catch (error) {
     console.error('Database Error:', error);
     throw new Error('Failed to fetch total number of invoices.');
@@ -137,6 +158,10 @@ export async function fetchInvoicesPages(query: string) {
 }
 
 export async function fetchInvoiceById(id: string) {
+  if (isBuildRunning) {
+    return [];
+  }
+
   try {
     const data = await connectionPool.query(`
       SELECT
@@ -162,25 +187,34 @@ export async function fetchInvoiceById(id: string) {
 }
 
 export async function fetchCustomers() {
+  if (isBuildRunning) {
+    return [];
+  }
+
   try {
     const data = await connectionPool.query(`
       SELECT
         id,
-        name
+        name,
+        image_url
       FROM customers
       ORDER BY name ASC
     `);
 
-    const customers = data.rows;
-    return customers;
+    return data.rows;
   } catch (err) {
     console.error('Database Error:', err);
     throw new Error('Failed to fetch all customers.');
   }
 }
 
-export async function fetchFilteredCustomers(query: string) {
+export async function fetchFilteredCustomers(query: string, currentPage: number) {
+  if (isBuildRunning) {
+    return [];
+  }
+
   try {
+    const offset = (currentPage - 1) * ITEMS_PER_PAGE;
     const data = await connectionPool.query(`
 		SELECT
 		  customers.id,
@@ -197,17 +231,36 @@ export async function fetchFilteredCustomers(query: string) {
         customers.email ILIKE '${`%${query}%`}'
 		GROUP BY customers.id, customers.name, customers.email, customers.image_url
 		ORDER BY customers.name ASC
+    LIMIT '${ITEMS_PER_PAGE}' OFFSET '${offset}'
 	  `);
 
-    const customers = data.rows.map((customer: CustomersTableType) => ({
+    return data.rows.map((customer: CustomersTableType) => ({
       ...customer,
       total_pending: formatCurrency(customer.total_pending),
       total_paid: formatCurrency(customer.total_paid),
     }));
-
-    return customers;
   } catch (err) {
     console.error('Database Error:', err);
     throw new Error('Failed to fetch customer table.');
+  }
+}
+
+export async function fetchCustomersPages(query: string) {
+  if (isBuildRunning) {
+    return 0;
+  }
+
+  try {
+    const count = await connectionPool.query(`SELECT COUNT(*)
+    FROM customers
+    WHERE
+		  customers.name ILIKE '${`%${query}%`}' OR
+        customers.email ILIKE '${`%${query}%`}'
+  `);
+
+    return Math.ceil(Number(count.rows[0].count) / ITEMS_PER_PAGE);
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch total number of customers.');
   }
 }

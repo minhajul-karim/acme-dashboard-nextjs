@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 const connectionPool = require("../../db");
 import { invoices, customers, revenue, users } from '../lib/placeholder-data';
 

@@ -1,16 +1,17 @@
 'use client';
 
-import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
 import Link from 'next/link';
+import { useEffect } from 'react';
+import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
 import { generatePagination } from '@/app/lib/utils';
-import { useSearchParams, usePathname } from 'next/navigation';
+import { useSearchParams, usePathname, useRouter } from 'next/navigation';
 
 export default function Pagination({ totalPages }: { totalPages: number }) {
+  const router = useRouter();
   const params = useSearchParams();
   const currentPathName = usePathname();
   const currentPage = Number(params.get("page")) || 1;
-
   const allPages = generatePagination(currentPage, totalPages);
 
   const createPageURL = (page: number | string) => {
@@ -18,6 +19,10 @@ export default function Pagination({ totalPages }: { totalPages: number }) {
     paginationParams.set("page", page.toString());
     return `${currentPathName}?${paginationParams.toString()}`;
   }
+
+  useEffect(() => {
+    router.push(createPageURL(currentPage));
+  }, [currentPage]);
 
   return (
     <>
