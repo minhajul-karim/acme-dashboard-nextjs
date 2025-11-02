@@ -1,13 +1,13 @@
-import LoginForm from "../ui/login-form";
+import SignupForm from "../ui/signup-form";
 import AcmeLogo from "../ui/acme-logo";
 import { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Log in",
+  title: "Sign up",
 };
 
-export default function Login() {
+export default function Signup() {
   return (
     <main className="flex items-center justify-center md:h-screen">
       <div className="relative mx-auto flex w-full max-w-[400px] flex-col space-y-2.5 p-4 md:-mt-32">
@@ -16,10 +16,10 @@ export default function Login() {
             <AcmeLogo />
           </div>
         </div>
-        <LoginForm />
+        <SignupForm />
         <p className="text-center font-bold">
-          Don't have an accout?
-          <Link className="text-blue-500 underline" href="/signup"> Sign up</Link>
+          Already have an accout?
+          <Link className="text-blue-500 underline" href="/login"> Log in</Link>
         </p>
       </div>
     </main>
