@@ -1,30 +1,31 @@
 "use client";
 
-import { FormEvent, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { montserrat } from '@/app/ui/fonts';
-import {
-  AtSymbolIcon,
-  KeyIcon,
-} from '@heroicons/react/24/outline';
-import { ArrowRightIcon } from '@heroicons/react/20/solid';
-import { Button } from './button';
-import { authenticate } from '../lib/actions';
+import { FormEvent, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { montserrat } from "@/app/ui/fonts";
+import { AtSymbolIcon, KeyIcon } from "@heroicons/react/24/outline";
+import { ArrowRightIcon } from "@heroicons/react/20/solid";
+import { Button } from "./button";
+import { authenticate } from "../lib/actions";
 
 export default function LoginForm() {
+  const [isLoading, startTransition] = useTransition();
   const [errorMessage, setErrorMessage] = useState("");
   const router = useRouter();
 
-  const handleFormSubmit = async (event: FormEvent<HTMLFormElement>) => {
+  const handleFormSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    const response = await authenticate(formData);
-    if (response.error) {
-      setErrorMessage(response.message);
-    } else {
-      router.push("/dashboard");
-    }
-  }
+    startTransition(async () => {
+      setErrorMessage("");
+      const response = await authenticate(formData);
+      if (response.error) {
+        setErrorMessage(response.message);
+      } else {
+        router.push("/dashboard");
+      }
+    });
+  };
 
   return (
     <form className="space-y-3" onSubmit={handleFormSubmit}>
@@ -76,7 +77,13 @@ export default function LoginForm() {
           </div>
         </div>
         <Button className="mt-4 w-full" aria-disabled={false}>
-          Log in <ArrowRightIcon className="ml-auto h-5 w-5 text-gray-50" />
+          {isLoading ? (
+            <span className="mx-auto">....</span>
+          ) : (
+            <>
+              Log in <ArrowRightIcon className="ml-auto h-5 w-5 text-gray-50" />
+            </>
+          )}
         </Button>
         <div className="flex h-8 items-end space-x-1">
           {errorMessage && (
